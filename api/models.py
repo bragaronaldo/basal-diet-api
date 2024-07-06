@@ -17,6 +17,9 @@ class User(BaseModel):
     basalMetabolicRate = models.FloatField(default=0)
     userImage = models.CharField(max_length=8000, default="user_image")
 
+    def __str__(self):
+        return self.name
+
 class Meal(BaseModel):
     name = models.CharField(max_length=200)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)

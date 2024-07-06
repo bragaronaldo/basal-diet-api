@@ -3,8 +3,13 @@ from rest_framework.decorators import api_view
 from . models import User, Meal, Food
 from . serializers import UserSerializer, MealSerializer, FoodSerializer
 from rest_framework import status
+from rest_framework.decorators import authentication_classes, permission_classes
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 @api_view(['GET', 'POST'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def users(request):
     if (request.method == 'GET'):
         id = request.query_params.get('id')
@@ -26,6 +31,8 @@ def users(request):
         return Response(serializer.data)
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def meals(request, meal_id=None):
     if request.method == 'GET':
         id = request.query_params.get('user_id')
@@ -64,6 +71,8 @@ def meals(request, meal_id=None):
     return Response(serializer.errors, status=400)
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def foods(request, food_id=None):
     if request.method == 'GET':
         id = request.query_params.get('user_id')
