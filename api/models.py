@@ -7,7 +7,8 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
-class User(BaseModel):
+class UserProfile(BaseModel):
+    user_id = models.IntegerField();
     name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
     gender = models.CharField(max_length=50)
@@ -15,17 +16,16 @@ class User(BaseModel):
     height = models.IntegerField(default=0)
     weight = models.IntegerField(default=0)
     basalMetabolicRate = models.FloatField(default=0)
-    userImage = models.CharField(max_length=8000, default="user_image")
 
     def __str__(self):
         return self.name
 
 class Meal(BaseModel):
     name = models.CharField(max_length=200)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
 
 class Food(BaseModel):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     meal_id = models.ForeignKey(Meal, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     amount = models.FloatField(default=0)
@@ -33,6 +33,3 @@ class Food(BaseModel):
     proteins = models.FloatField(default=0)
     fats = models.FloatField(default=0)
     calories = models.FloatField(default=0)
-
-# class ImageModel(models.Model):
-#     name = models.ImageField(upload_to='media/images')

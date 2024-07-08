@@ -1,34 +1,50 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from . models import User, Meal, Food
-from . serializers import UserSerializer, MealSerializer, FoodSerializer
+from . models import UserProfile, Meal, Food
+from . serializers import UserProfileSerializer, MealSerializer, FoodSerializer
 from rest_framework import status
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
+
 @api_view(['GET', 'POST'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def users(request):
+def user_profiles(request):
     if (request.method == 'GET'):
         id = request.query_params.get('id')
-
         if id is not None:
-            user = User.objects.get(id=id)
-            serializer = UserSerializer(user)
+            user_profiles = UserProfile.objects.filter(id=id)
         else:
-            users = User.objects.all()
-            serializer = UserSerializer(users, many=True)
+            user_profiles = UserProfile.objects.all()
+
+        serializer = UserProfileSerializer(user_profiles, many=True)
 
         return Response(serializer.data)
 
     elif (request.method == 'POST'):
-        serializer = UserSerializer(data=request.data)
+        serializer = UserProfileSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
 
         return Response(serializer.data)
+
+@api_view(['GET'])
+def user_profiles_by_user_id(request):
+    user_id = request.query_params.get('user_id')
+    print(f'ID da rota: {user_id}')
+
+    if user_id is not None:
+        profiles = UserProfile.objects.filter(user_id=user_id)
+        print(f'Profiles: {profiles}')
+    else:
+        profiles = UserProfile.objects.all()
+        
+    serializer = UserProfileSerializer(profiles, many=True)
+
+    return Response(serializer.data)
+
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
@@ -69,6 +85,7 @@ def meals(request, meal_id=None):
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors, status=400)
+
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
