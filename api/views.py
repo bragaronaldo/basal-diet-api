@@ -31,13 +31,13 @@ def user_profiles(request):
         return Response(serializer.data)
 
 @api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def user_profiles_by_user_id(request):
     user_id = request.query_params.get('user_id')
-    print(f'ID da rota: {user_id}')
 
     if user_id is not None:
         profiles = UserProfile.objects.filter(user_id=user_id)
-        print(f'Profiles: {profiles}')
     else:
         profiles = UserProfile.objects.all()
         
