@@ -8,7 +8,26 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 from rest_framework.permissions import IsAuthenticated
 
 
-@api_view(['GET', 'POST'])
+
+@api_view(['GET', 'PUT'])
+def user_profile(request, id):
+    try:
+        profile = UserProfile.objects.get(id=id)
+    except UserProfile.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = UserProfileSerializer(profile)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = UserProfileSerializer(profile, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET', 'POST', 'PUT'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def user_profiles(request):
@@ -29,6 +48,14 @@ def user_profiles(request):
             serializer.save()
 
         return Response(serializer.data)
+    
+    elif (request.method == 'PUT'):
+        print("PUT REQUEST!")
+        try:
+            profile = UserProfile.objects.get(id=request.data['id'])
+            serializer = UserProfileSerializer(profile, data=request.data)
+        except UserProfile.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
